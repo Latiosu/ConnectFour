@@ -3,17 +3,17 @@ import java.util.Scanner;
 public class ConnectFour extends Thread {
 
     Scanner sc;         // To retrieve player input
-    Player[][] grid;   // [rows][columns]
+    Tile[][] grid;      // [rows][columns]
     int rows, columns;  // Size of grid
-    int turn;           // Even turn = COMPUTER, Odd turn = HUMAN
+    int turn;           // Even turn = COMPUTER, Odd turn = PLAYER
 
     /**
-     * Identification system for each cell in the grid.
+     * Identification system for each tile in the grid.
      */
-    enum Player {
-        NONE,       // Unoccupied cell
-        HUMAN,      // Cell occupied by human
-        COMPUTER    // Cell occupied by computer
+    enum Tile {
+        NONE,       // Unoccupied tile
+        PLAYER,     // Tile occupied by player
+        COMPUTER    // Tile occupied by computer
     }
 
     /**
@@ -24,21 +24,20 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Creates a grid with specified number of columns and rows for a game of
-     * Connect Four.
+     * Creates a grid with specified number of columns and rows for a game of Connect Four.
      */
     public ConnectFour(int columns, int rows) {
         this.columns = columns;
         this.rows = rows;
-        this.turn = 1;          // Player always goes first
+        this.turn = 1;          // Player always goes first (odd number)
 
-        grid = new Player[rows][columns];
+        grid = new Tile[rows][columns];
         sc = new Scanner(System.in);
 
-        // Initialize grid with NONE (unoccupied cells)
+        // Initialize grid with NONE (unoccupied tiles)
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                grid[i][j] = Player.NONE;
+                grid[i][j] = Tile.NONE;
             }
         }
     }
@@ -51,7 +50,7 @@ public class ConnectFour extends Thread {
             // Check if game has ended before handling moves
             if (isGameFinished(grid)) {
                 printGrid();
-                // Player wins if game ends on computer's turn, loss otherwise
+                // You win if game ends on the computer's turn, loss otherwise
                 if (turn % 2 == 0) {    // Computer's turn
                     System.out.println("Connect Four! You win!!");
                 } else {                // Your turn
@@ -78,23 +77,21 @@ public class ConnectFour extends Thread {
      * Add your computer's AI logic to this method!
      */
     public void resolveComputerMove() {
-
         // You should comment this out!
         // ---------------------------------------------------
         // Default behaviour: Choose a random column
         while (true) {
             int randomColumn = (int)(columns * Math.random());
-            if (makeMove(Player.COMPUTER, randomColumn)) {
+            if (makeMove(Tile.COMPUTER, randomColumn)) {
                 break;
             }
         }
         // ---------------------------------------------------
-
     }
 
     /**
      * =========================================================
-     * This method is called every time it's the computer's turn
+     * This method is called every time it's the player's turn
      * =========================================================
      * Awaits for the player to type a valid move and processes it.
      */
@@ -107,7 +104,7 @@ public class ConnectFour extends Thread {
             System.out.print("Enter a column (0-" + (columns-1) + "): ");
             if (sc.hasNextInt()) {
                 column = sc.nextInt();
-                if (makeMove(Player.HUMAN, column))
+                if (makeMove(Tile.PLAYER, column))
                     retry = false;
                 else
                     System.err.println("-- Out of range! (" + column + ") --");
@@ -119,22 +116,21 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Attempts to make a move for the specified player in the given column and
-     * returns whether it was successful or not.
+     * Attempts to make a move in the given column and returns whether it was successful or not.
      *
      * E.g. the computer wants to make a move in column 0:
-     * makeMove(Player.COMPUTER, 0);
+     * makeMove(Tile.COMPUTER, 0);
      */
-    public boolean makeMove(Player player, int column) {
+    public boolean makeMove(Tile tile, int column) {
         // Validate is there is space to make the move
         if (column >= 0 &&
                 column < columns &&
-                grid[rows - 1][column] == Player.NONE) {
+                grid[rows - 1][column] == Tile.NONE) {
             // Find top of column to add new move
             int row = 0;
             while (row < rows) {
-                if (grid[row][column] == Player.NONE) {
-                    grid[row][column] = player;
+                if (grid[row][column] == Tile.NONE) {
+                    grid[row][column] = tile;
                     return true;
                 }
                 row++;
@@ -151,75 +147,74 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Checks whether the victory condition is met (Connect Four) for the
-     * given grid state.
+     * Checks whether the victory condition is met (Connect Four) for the given grid state.
      */
-    public boolean isGameFinished(Player[][] grid) {
-        // Check every square and it's cardinal directions for victory
+    public boolean isGameFinished(Tile[][] grid) {
+        // Check every tile and it's cardinal directions for victory
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns ; j++) {
-                Player player;
+                Tile tile;
 
                 // Skip blanks
-                if (grid[i][j] == Player.NONE)
+                if (grid[i][j] == Tile.NONE)
                     continue;
                 else
-                    player = grid[i][j];
+                    tile = grid[i][j];
 
                 // Up
                 if (isValid(j, i+3) &&
-                        grid[i+1][j] == player &&
-                        grid[i+2][j] == player &&
-                        grid[i+3][j] == player)
+                        grid[i+1][j] == tile &&
+                        grid[i+2][j] == tile &&
+                        grid[i+3][j] == tile)
                     return true;
 
                 // Up-right
                 if (isValid(j+3, i+3) &&
-                        grid[i+1][j+1] == player &&
-                        grid[i+2][j+2] == player &&
-                        grid[i+3][j+3] == player)
+                        grid[i+1][j+1] == tile &&
+                        grid[i+2][j+2] == tile &&
+                        grid[i+3][j+3] == tile)
                     return true;
 
                 // Right
                 if (isValid(j+3, i) &&
-                        grid[i][j+1] == player &&
-                        grid[i][j+2] == player &&
-                        grid[i][j+3] == player)
+                        grid[i][j+1] == tile &&
+                        grid[i][j+2] == tile &&
+                        grid[i][j+3] == tile)
                     return true;
 
                 // Down-right
                 if (isValid(j+3, i-3) &&
-                        grid[i-1][j+1] == player &&
-                        grid[i-2][j+2] == player &&
-                        grid[i-3][j+3] == player)
+                        grid[i-1][j+1] == tile &&
+                        grid[i-2][j+2] == tile &&
+                        grid[i-3][j+3] == tile)
                     return true;
 
                 // Down
                 if (isValid(j, i-3) &&
-                        grid[i-1][j] == player &&
-                        grid[i-2][j] == player &&
-                        grid[i-3][j] == player)
+                        grid[i-1][j] == tile &&
+                        grid[i-2][j] == tile &&
+                        grid[i-3][j] == tile)
                     return true;
 
                 // Down-left
                 if (isValid(j-3, i-3) &&
-                        grid[i-1][j-1] == player &&
-                        grid[i-2][j-2] == player &&
-                        grid[i-3][j-3] == player)
+                        grid[i-1][j-1] == tile &&
+                        grid[i-2][j-2] == tile &&
+                        grid[i-3][j-3] == tile)
                     return true;
 
                 // Left
                 if (isValid(j-3, i) &&
-                        grid[i][j-1] == player &&
-                        grid[i][j-2] == player &&
-                        grid[i][j-3] == player)
+                        grid[i][j-1] == tile &&
+                        grid[i][j-2] == tile &&
+                        grid[i][j-3] == tile)
                     return true;
 
                 // Up-left
                 if (isValid(j-3, i+3) &&
-                        grid[i+1][j-1] == player &&
-                        grid[i+2][j-2] == player &&
-                        grid[i+3][j-3] == player)
+                        grid[i+1][j-1] == tile &&
+                        grid[i+2][j-2] == tile &&
+                        grid[i+3][j-3] == tile)
                     return true;
             }
         }
@@ -237,7 +232,7 @@ public class ConnectFour extends Thread {
                     case NONE:
                         System.out.print("  ");
                         break;
-                    case HUMAN:
+                    case PLAYER:
                         System.out.print("O ");
                         break;
                     case COMPUTER:
