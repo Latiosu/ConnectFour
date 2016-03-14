@@ -25,15 +25,16 @@ public class ConnectFour extends Thread {
      * Creates a grid with specified number of columns and rows for a game of Connect Four and if it is for bots.
      */
     public ConnectFour(boolean isBotsOnly, int columns, int rows) {
+
         this.isBotsOnly = isBotsOnly;
         if (isBotsOnly) {
-            botA = new Bot(this);
-            botB = new Bot(this);
+            botA = new Bot(this);   // <---- Replace this when playing AI vs AI
+            botB = new Bot(this);   // <---- Replace this when playing AI vs AI
         }
 
         this.columns = columns;
         this.rows = rows;
-        this.turn = 1;          // Player or BotA always goes first (odd number)
+        this.turn = 1;              // Player or BotA always goes first (odd number)
 
         grid = new Tile[rows][columns];
         sc = new Scanner(System.in);
