@@ -3,12 +3,12 @@ import java.util.Scanner;
 public class ConnectFour extends Thread {
 
     Scanner sc;         // To retrieve player input
-    Player[][] board;   // [rows][columns]
-    int rows, columns;  // Size of board
+    Player[][] grid;   // [rows][columns]
+    int rows, columns;  // Size of grid
     int turn;           // Even turn = COMPUTER, Odd turn = HUMAN
 
     /**
-     * Identification system for each cell in the board.
+     * Identification system for each cell in the grid.
      */
     enum Player {
         NONE,       // Unoccupied cell
@@ -24,7 +24,7 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Creates a board with specified number of columns and rows for a game of
+     * Creates a grid with specified number of columns and rows for a game of
      * Connect Four.
      */
     public ConnectFour(int columns, int rows) {
@@ -32,13 +32,13 @@ public class ConnectFour extends Thread {
         this.rows = rows;
         this.turn = 1;          // Player always goes first
 
-        board = new Player[rows][columns];
+        grid = new Player[rows][columns];
         sc = new Scanner(System.in);
 
-        // Initialize board with NONE (unoccupied cells)
+        // Initialize grid with NONE (unoccupied cells)
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                board[i][j] = Player.NONE;
+                grid[i][j] = Player.NONE;
             }
         }
     }
@@ -48,11 +48,9 @@ public class ConnectFour extends Thread {
         System.out.println("Let's play Connect Four!");
 
         while (true) {
-            // Show board before every move
-            printGrid();
-
             // Check if game has ended before handling moves
-            if (isGameFinished(board)) {
+            if (isGameFinished(grid)) {
+                printGrid();
                 // Player wins if game ends on computer's turn, loss otherwise
                 if (turn % 2 == 0) {    // Computer's turn
                     System.out.println("Connect Four! You win!!");
@@ -63,9 +61,9 @@ public class ConnectFour extends Thread {
             }
 
             if (turn % 2 == 0) {        // Computers's turn
-                System.out.println("Computer's move.");
                 resolveComputerMove();
             } else {                    // Your turn
+                printGrid();            // Show grid before every move
                 System.out.println("[Turn " + (turn/2 + 1) + "] Your move!");
                 resolvePlayerMove();
             }
@@ -131,12 +129,12 @@ public class ConnectFour extends Thread {
         // Validate is there is space to make the move
         if (column >= 0 &&
                 column < columns &&
-                board[rows - 1][column] == Player.NONE) {
+                grid[rows - 1][column] == Player.NONE) {
             // Find top of column to add new move
             int row = 0;
             while (row < rows) {
-                if (board[row][column] == Player.NONE) {
-                    board[row][column] = player;
+                if (grid[row][column] == Player.NONE) {
+                    grid[row][column] = player;
                     return true;
                 }
                 row++;
@@ -146,7 +144,7 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Returns true if the specified column and row fits within the board.
+     * Returns true if the specified column and row fits within the grid.
      */
     public boolean isValid(int column, int row) {
         return column >= 0 && column < columns && row >= 0 && row < rows;
@@ -154,7 +152,7 @@ public class ConnectFour extends Thread {
 
     /**
      * Checks whether the victory condition is met (Connect Four) for the
-     * given board state.
+     * given grid state.
      */
     public boolean isGameFinished(Player[][] grid) {
         // Check every square and it's cardinal directions for victory
@@ -229,13 +227,13 @@ public class ConnectFour extends Thread {
     }
 
     /**
-     * Prints the state of the board to the console
+     * Prints the state of the grid to the console
      */
     public void printGrid() {
-        // Show state of board
+        // Show state of grid
         for (int i = rows - 1; i >= 0; i--) {
             for (int j = 0; j < columns; j++) {
-                switch (board[i][j]) {
+                switch (grid[i][j]) {
                     case NONE:
                         System.out.print("  ");
                         break;
@@ -252,7 +250,7 @@ public class ConnectFour extends Thread {
 
         // Draw a line
         for (int i = 0; i < columns; i++) {
-            System.out.print("--");
+            System.out.print("-.");
         }
         System.out.println();
 
